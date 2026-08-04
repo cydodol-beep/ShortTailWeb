@@ -306,6 +306,8 @@ export default function App() {
 
   // Filtered Products
   const filteredProducts = products.filter((product) => {
+    if (product.is_active === false) return false;
+
     if (selectedCategoryId) {
       const matchCatId = product.category_id === selectedCategoryId;
       const matchCatName = categories.find((c) => c.id === selectedCategoryId)?.name === product.category;
