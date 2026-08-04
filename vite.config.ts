@@ -10,6 +10,7 @@ export default defineConfig({
   }
 }() => {
   return {
+    base: '/ShortTailWeb/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
