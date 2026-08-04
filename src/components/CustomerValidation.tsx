@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
-import { normalizePhoneNumber, formatDisplayPhone } from '../lib/utils';
+import { normalizePhoneNumber, formatDisplayPhone, maskPhoneNumber, maskName, maskAddress } from '../lib/utils';
 import { Customer } from '../types';
-import { Search, UserPlus, CheckCircle2, Phone, MapPin, Building, ArrowRight, Store } from 'lucide-react';
+import { Search, UserPlus, CheckCircle2, Phone, MapPin, Building, ArrowRight, Store, ShieldCheck } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
 interface CustomerValidationProps {
@@ -252,15 +252,21 @@ export const CustomerValidation: React.FC<CustomerValidationProps> = ({
                         <span>Data Pelanggan Ditemukan!</span>
                       </div>
 
-                      <div className="space-y-1.5 text-xs text-slate-700 bg-white p-3 rounded-lg border border-emerald-100 shadow-sm">
-                        <div className="font-bold text-slate-900 text-sm mb-1">{foundCustomer.name}</div>
+                      <div className="space-y-2 text-xs text-slate-700 bg-white p-3.5 rounded-lg border border-emerald-100 shadow-sm">
+                        <div className="flex items-center justify-between gap-2 pb-1.5 border-b border-slate-100">
+                          <div className="font-bold text-slate-900 text-sm tracking-tight">{maskName(foundCustomer.name)}</div>
+                          <span className="text-[10px] font-semibold bg-emerald-50 text-emerald-800 px-2 py-0.5 rounded-md border border-emerald-200/80 flex items-center gap-1 shrink-0">
+                            <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <span>Protected</span>
+                          </span>
+                        </div>
                         <div className="flex items-center text-slate-600">
                           <Phone className="w-3.5 h-3.5 mr-1.5 text-emerald-600 shrink-0" />
-                          {formatDisplayPhone(foundCustomer.phone)}
+                          <span className="font-mono">{maskPhoneNumber(foundCustomer.phone)}</span>
                         </div>
                         <div className="flex items-start text-slate-600">
                           <MapPin className="w-3.5 h-3.5 mr-1.5 text-emerald-600 shrink-0 mt-0.5" />
-                          <span>{foundCustomer.address}, {foundCustomer.city}, {foundCustomer.province} {foundCustomer.postcode || ''}</span>
+                          <span>{maskAddress(foundCustomer.address)}, {foundCustomer.city}, {foundCustomer.province} {foundCustomer.postcode || ''}</span>
                         </div>
                       </div>
 

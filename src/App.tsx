@@ -6,7 +6,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from './lib/supabase';
 import { Customer, Product, ProductVariant, Category, CartItem, Order } from './types';
-import { generateCustomOrderId } from './lib/utils';
+import { generateCustomOrderId, isProductActive } from './lib/utils';
 import { CustomerValidation } from './components/CustomerValidation';
 import { Navbar } from './components/Navbar';
 import { ProductCard } from './components/ProductCard';
@@ -120,15 +120,17 @@ export default function App() {
         const rawProducts = (prodData as Product[]) || [];
         const rawVariants = (varData as ProductVariant[]) || [];
 
-        const formattedProducts = rawProducts.map((p) => {
-          const pVars = rawVariants.filter((v) => v.product_id === p.id);
-          const hasVar = Boolean(p.has_variants || pVars.length > 0);
-          return {
-            ...p,
-            has_variants: hasVar,
-            variants: pVars,
-          };
-        });
+        const formattedProducts = rawProducts
+          .filter(isProductActive)
+          .map((p) => {
+            const pVars = rawVariants.filter((v) => v.product_id === p.id);
+            const hasVar = Boolean(p.has_variants || pVars.length > 0);
+            return {
+              ...p,
+              has_variants: hasVar,
+              variants: pVars,
+            };
+          });
 
         setProducts(formattedProducts);
       }
@@ -306,7 +308,7 @@ export default function App() {
 
   // Filtered Products
   const filteredProducts = products.filter((product) => {
-    if (product.is_active === false) return false;
+    if (!isProductActive(product)) return false;
 
     if (selectedCategoryId) {
       const matchCatId = product.category_id === selectedCategoryId;

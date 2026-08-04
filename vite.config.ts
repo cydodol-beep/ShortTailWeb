@@ -4,9 +4,7 @@ import path from 'path';
 import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
-  const isVercel = process.env.VERCEL === '1';
   return {
-    base: isVercel ? '/' : '/ShortTailWeb/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

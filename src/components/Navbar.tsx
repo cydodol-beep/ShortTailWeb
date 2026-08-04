@@ -1,7 +1,7 @@
 import React from 'react';
 import { Customer, Category } from '../types';
 import { ShoppingBag, Search, Store, User, X } from 'lucide-react';
-import { formatDisplayPhone } from '../lib/utils';
+import { formatDisplayPhone, maskPhoneNumber } from '../lib/utils';
 
 interface NavbarProps {
   customer: Customer;
@@ -65,7 +65,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               </div>
               <div className="text-xs text-slate-700 leading-tight max-w-[160px] truncate">
                 <div className="font-semibold text-slate-900 truncate">{customer.name}</div>
-                <div className="text-[10px] text-slate-500">{formatDisplayPhone(customer.phone)}</div>
+                <div className="text-[10px] text-slate-500 font-mono">{maskPhoneNumber(customer.phone)}</div>
               </div>
               <button
                 onClick={onChangeCustomer}
@@ -96,7 +96,7 @@ export const Navbar: React.FC<NavbarProps> = ({
         <div className="sm:hidden mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600 bg-slate-50 px-2.5 py-1.5 rounded-lg">
           <div className="flex items-center space-x-1.5 truncate">
             <User className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-            <span className="font-medium truncate">{customer.name} ({formatDisplayPhone(customer.phone)})</span>
+            <span className="font-medium truncate">{customer.name} (<span className="font-mono">{maskPhoneNumber(customer.phone)}</span>)</span>
           </div>
           <button
             onClick={onChangeCustomer}

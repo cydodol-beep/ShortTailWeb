@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { CartItem, Customer } from '../types';
-import { formatRupiah, formatDisplayPhone } from '../lib/utils';
+import { formatRupiah, formatDisplayPhone, maskPhoneNumber, maskAddress } from '../lib/utils';
 import { X, Trash2, Plus, Minus, ShoppingBag, MapPin, User, ArrowRight, FileText, Store } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -181,11 +181,11 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({
 
                     <div className="text-xs text-slate-700 space-y-1 bg-white p-2.5 rounded-xl border border-emerald-100">
                       <div className="font-bold text-slate-900">{customer.name}</div>
-                      <div className="text-slate-600">{formatDisplayPhone(customer.phone)}</div>
+                      <div className="text-slate-600 font-mono">{maskPhoneNumber(customer.phone)}</div>
                       <div className="text-slate-500 text-[11px] flex items-start space-x-1 mt-1">
                         <MapPin className="w-3 h-3 text-emerald-600 shrink-0 mt-0.5" />
                         <span>
-                          {customer.address}, {customer.city}, {customer.province} {customer.postcode || ''}
+                          {maskAddress(customer.address)}, {customer.city}, {customer.province} {customer.postcode || ''}
                         </span>
                       </div>
                     </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Customer, Order } from '../types';
-import { formatRupiah, formatDisplayPhone } from '../lib/utils';
+import { formatRupiah, formatDisplayPhone, maskPhoneNumber, maskAddress } from '../lib/utils';
 import { CheckCircle2, MessageSquare, ShoppingBag, ArrowRight, Copy, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -113,8 +113,8 @@ Mohon konfirmasi pesanan saya. Terima kasih!`;
             <div className="text-xs text-slate-600 bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1">
               <div className="font-bold text-slate-800 mb-1">Informasi Pemesan:</div>
               <div><span className="text-slate-400">Nama:</span> {customer.name}</div>
-              <div><span className="text-slate-400">No. HP:</span> {formatDisplayPhone(customer.phone)}</div>
-              <div><span className="text-slate-400">Alamat:</span> {customer.address}, {customer.city}</div>
+              <div><span className="text-slate-400">No. HP:</span> <span className="font-mono">{maskPhoneNumber(customer.phone)}</span></div>
+              <div><span className="text-slate-400">Alamat:</span> {maskAddress(customer.address)}, {customer.city}</div>
               <div><span className="text-slate-400">Sumber:</span> <span className="text-emerald-700 font-semibold bg-emerald-100 px-1.5 py-0.5 rounded text-[10px]">WebStore</span></div>
             </div>
           </div>

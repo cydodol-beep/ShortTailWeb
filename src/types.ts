@@ -43,6 +43,7 @@ export interface Product {
   main_image_url?: string;
   unit_weight_grams?: number;
   is_active?: boolean;
+  status?: boolean | string | number;
   has_variants?: boolean;
   variants?: ProductVariant[];
   created_at?: string;
