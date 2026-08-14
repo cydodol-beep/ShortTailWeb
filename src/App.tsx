@@ -15,8 +15,10 @@ import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { GeminiPromptModal } from './components/GeminiPromptModal';
 import { WhatsAppChatModal } from './components/WhatsAppChatModal';
-import { Package, RefreshCw, ShoppingBag, Sparkles, Store, MessageSquare } from 'lucide-react';
+import { ResellerModal } from './components/ResellerModal';
+import { Package, RefreshCw, ShoppingBag, Sparkles, Store, MessageSquare, Building2 } from 'lucide-react';
 import { motion } from 'motion/react';
+
 
 export default function App() {
   // Active Customer State
@@ -64,7 +66,11 @@ export default function App() {
   const [whatsAppInitialProduct, setWhatsAppInitialProduct] = useState<Product | null>(null);
   const [whatsAppInitialText, setWhatsAppInitialText] = useState<string>('');
 
+  // Reseller Modal State
+  const [isResellerModalOpen, setIsResellerModalOpen] = useState(false);
+
   const handleOpenWhatsAppChat = (product?: Product | null, initialText?: string) => {
+
     setWhatsAppInitialProduct(product || null);
     setWhatsAppInitialText(initialText || '');
     setIsWhatsAppChatOpen(true);
@@ -387,9 +393,11 @@ export default function App() {
           onOpenCart={() => setIsCartOpen(true)}
           onChangeCustomer={() => setCustomer(null)}
           onOpenWhatsAppChat={() => handleOpenWhatsAppChat()}
+          onOpenResellerModal={() => setIsResellerModalOpen(true)}
           storeLogo={storeLogo}
           storeName={storeName}
         />
+
 
         {/* Main Content Area */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -411,6 +419,34 @@ export default function App() {
               <Store className="w-64 h-64" />
             </div>
           </div>
+
+          {/* Reseller Callout Banner */}
+          <div className="bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-amber-600/10 border border-amber-200/90 rounded-2xl p-4 mb-8 flex flex-col sm:flex-row items-center justify-between gap-3 shadow-2xs">
+            <div className="flex items-center space-x-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold shrink-0 shadow-xs">
+                <Building2 className="w-5 h-5" />
+              </div>
+              <div>
+                <div className="font-extrabold text-slate-900 text-xs sm:text-sm flex items-center gap-2">
+                  Ingin Menjadi Reseller ShortTail.id?
+                  <span className="bg-amber-100 text-amber-800 text-[10px] px-2 py-0.5 rounded-full font-bold border border-amber-200">
+                    Peluang Bisnis
+                  </span>
+                </div>
+                <p className="text-slate-600 text-[11px] sm:text-xs">
+                  Dapatkan harga grosir khusus untuk pilihan <strong>Brand ShortTail.id</strong> atau <strong>White Label</strong>.
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={() => setIsResellerModalOpen(true)}
+              className="w-full sm:w-auto bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-extrabold text-xs px-4 py-2.5 rounded-xl transition-all shadow-xs shrink-0 flex items-center justify-center space-x-1.5 cursor-pointer"
+            >
+              <Building2 className="w-4 h-4" />
+              <span>Daftar Reseller Sekarang</span>
+            </button>
+          </div>
+
 
           {/* Catalog Section Header */}
           <div className="flex items-center justify-between mb-6">
@@ -565,10 +601,18 @@ export default function App() {
       <footer className="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>&copy; {new Date().getFullYear()} ShortTail Store POS Web Order System</span>
+          <button
+            onClick={() => setIsResellerModalOpen(true)}
+            className="text-amber-700 font-bold hover:underline cursor-pointer flex items-center gap-1"
+          >
+            <Building2 className="w-3.5 h-3.5 text-amber-600" />
+            <span>Pendaftaran Kemitraan Reseller</span>
+          </button>
         </div>
       </footer>
 
       {/* Product Detail Modal */}
+
       <ProductDetailModal
         product={detailProduct}
         cart={cart}
@@ -609,7 +653,15 @@ export default function App() {
         initialLinkOrText={whatsAppInitialText}
       />
 
+      {/* Reseller Registration Modal */}
+      <ResellerModal
+        isOpen={isResellerModalOpen}
+        onClose={() => setIsResellerModalOpen(false)}
+        customer={customer}
+      />
+
       {/* Google Gemini Specification Prompt Modal */}
+
       <GeminiPromptModal
         isOpen={isPromptModalOpen}
         onClose={() => setIsPromptModalOpen(false)}

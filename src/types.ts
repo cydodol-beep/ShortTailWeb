@@ -82,3 +82,20 @@ export interface OrderItem {
   quantity: number;
   price_at_purchase: number;
 }
+
+export type ResellerType = 'shorttail_brand' | 'white_label';
+
+export interface ResellerRegistration {
+  id?: string;
+  name: string;
+  phone: string;
+  email: string;
+  address: string;
+  city: string;
+  province?: string;
+  reseller_type: ResellerType;
+  business_name?: string;
+  notes?: string;
+  created_at?: string;
+}
+

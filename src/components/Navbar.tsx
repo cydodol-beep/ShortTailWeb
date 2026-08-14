@@ -1,6 +1,6 @@
 import React from 'react';
 import { Customer, Category } from '../types';
-import { ShoppingBag, Search, Store, User, X, MessageSquare } from 'lucide-react';
+import { ShoppingBag, Search, Store, User, X, MessageSquare, Building2 } from 'lucide-react';
 import { formatDisplayPhone, maskPhoneNumber } from '../lib/utils';
 
 interface NavbarProps {
@@ -14,6 +14,7 @@ interface NavbarProps {
   onOpenCart: () => void;
   onChangeCustomer: () => void;
   onOpenWhatsAppChat?: () => void;
+  onOpenResellerModal?: () => void;
   storeLogo?: string | null;
   storeName?: string;
 }
@@ -29,6 +30,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenCart,
   onChangeCustomer,
   onOpenWhatsAppChat,
+  onOpenResellerModal,
   storeLogo,
   storeName = 'ShortTail Web Store',
 }) => {
@@ -78,6 +80,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             </div>
 
+            {/* Reseller Registration Button */}
+            {onOpenResellerModal && (
+              <button
+                onClick={onOpenResellerModal}
+                className="flex items-center space-x-1.5 bg-gradient-to-r from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 text-amber-900 border border-amber-300/80 px-3 py-2 rounded-xl font-extrabold text-xs transition-all cursor-pointer shrink-0 shadow-2xs"
+                title="Daftar Menjadi Reseller ShortTail.id / White Label"
+              >
+                <Building2 className="w-4 h-4 text-amber-600" />
+                <span className="hidden sm:inline">Jadi Reseller</span>
+              </button>
+            )}
+
             {/* WhatsApp Chat Button */}
             {onOpenWhatsAppChat && (
               <button
@@ -89,6 +103,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span className="hidden sm:inline">Tanya WA</span>
               </button>
             )}
+
 
             {/* Cart Button */}
             <button
