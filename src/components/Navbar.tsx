@@ -1,6 +1,6 @@
 import React from 'react';
 import { Customer, Category } from '../types';
-import { ShoppingBag, Search, Store, User, X } from 'lucide-react';
+import { ShoppingBag, Search, Store, User, X, MessageSquare } from 'lucide-react';
 import { formatDisplayPhone, maskPhoneNumber } from '../lib/utils';
 
 interface NavbarProps {
@@ -13,6 +13,7 @@ interface NavbarProps {
   cartCount: number;
   onOpenCart: () => void;
   onChangeCustomer: () => void;
+  onOpenWhatsAppChat?: () => void;
   storeLogo?: string | null;
   storeName?: string;
 }
@@ -27,6 +28,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   cartCount,
   onOpenCart,
   onChangeCustomer,
+  onOpenWhatsAppChat,
   storeLogo,
   storeName = 'ShortTail Web Store',
 }) => {
@@ -75,6 +77,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                 Ganti
               </button>
             </div>
+
+            {/* WhatsApp Chat Button */}
+            {onOpenWhatsAppChat && (
+              <button
+                onClick={onOpenWhatsAppChat}
+                className="flex items-center space-x-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/90 px-3 py-2 rounded-xl font-bold text-xs transition-all cursor-pointer shrink-0 shadow-2xs"
+                title="Chat Admin WA (Tanya / Tempel Link)"
+              >
+                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                <span className="hidden sm:inline">Tanya WA</span>
+              </button>
+            )}
 
             {/* Cart Button */}
             <button

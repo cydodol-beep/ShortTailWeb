@@ -14,7 +14,8 @@ import { ProductDetailModal } from './components/ProductDetailModal';
 import { CartDrawer } from './components/CartDrawer';
 import { CheckoutModal } from './components/CheckoutModal';
 import { GeminiPromptModal } from './components/GeminiPromptModal';
-import { Package, RefreshCw, ShoppingBag, Sparkles, Store } from 'lucide-react';
+import { WhatsAppChatModal } from './components/WhatsAppChatModal';
+import { Package, RefreshCw, ShoppingBag, Sparkles, Store, MessageSquare } from 'lucide-react';
 import { motion } from 'motion/react';
 
 export default function App() {
@@ -57,6 +58,31 @@ export default function App() {
   const [lastCartSummary, setLastCartSummary] = useState<{ name: string; quantity: number; price: number }[]>([]);
   const [submittingOrder, setSubmittingOrder] = useState(false);
   const [isPromptModalOpen, setIsPromptModalOpen] = useState(false);
+
+  // WhatsApp Chat Modal States
+  const [isWhatsAppChatOpen, setIsWhatsAppChatOpen] = useState(false);
+  const [whatsAppInitialProduct, setWhatsAppInitialProduct] = useState<Product | null>(null);
+  const [whatsAppInitialText, setWhatsAppInitialText] = useState<string>('');
+
+  const handleOpenWhatsAppChat = (product?: Product | null, initialText?: string) => {
+    setWhatsAppInitialProduct(product || null);
+    setWhatsAppInitialText(initialText || '');
+    setIsWhatsAppChatOpen(true);
+  };
+
+  // URL Deep Link check for ?product=ID or ?product_id=ID
+  useEffect(() => {
+    if (products.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const targetProdId = urlParams.get('product') || urlParams.get('product_id') || urlParams.get('item');
+      if (targetProdId) {
+        const found = products.find((p) => String(p.id) === String(targetProdId));
+        if (found) {
+          setDetailProduct(found);
+        }
+      }
+    }
+  }, [products]);
 
   // Save customer to localStorage
   useEffect(() => {
@@ -360,6 +386,7 @@ export default function App() {
           cartCount={cartTotalItems}
           onOpenCart={() => setIsCartOpen(true)}
           onChangeCustomer={() => setCustomer(null)}
+          onOpenWhatsAppChat={() => handleOpenWhatsAppChat()}
           storeLogo={storeLogo}
           storeName={storeName}
         />
@@ -514,6 +541,26 @@ export default function App() {
         </div>
       )}
 
+      {/* Floating WhatsApp Chat Action Button */}
+      <div className="fixed bottom-6 right-6 z-40 flex flex-col items-end gap-2">
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={() => handleOpenWhatsAppChat()}
+          className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-800 hover:from-emerald-500 hover:to-teal-700 text-white font-extrabold p-3.5 sm:px-4 sm:py-3.5 rounded-full shadow-2xl flex items-center space-x-2 border border-emerald-400/40 cursor-pointer group"
+          title="Chat Admin WA (Tanya Detail / Tempel Link)"
+        >
+          <div className="relative">
+            <MessageSquare className="w-5 h-5 text-emerald-100" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full animate-ping" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-amber-400 rounded-full" />
+          </div>
+          <span className="text-xs sm:text-sm hidden sm:inline font-extrabold tracking-tight">
+            Tanya Admin WA
+          </span>
+        </motion.button>
+      </div>
+
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6 mt-12 text-center text-xs text-slate-400">
         <div className="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
@@ -528,6 +575,7 @@ export default function App() {
         onClose={() => setDetailProduct(null)}
         onAddToCart={handleAddToCart}
         onUpdateQuantity={handleUpdateQuantity}
+        onOpenWhatsAppChat={(p) => handleOpenWhatsAppChat(p)}
       />
 
       {/* Cart Drawer */}
@@ -549,6 +597,16 @@ export default function App() {
         customer={customer}
         cartSummary={lastCartSummary}
         onClose={() => setCreatedOrder(null)}
+      />
+
+      {/* WhatsApp Admin Direct Inquiry Modal */}
+      <WhatsAppChatModal
+        isOpen={isWhatsAppChatOpen}
+        onClose={() => setIsWhatsAppChatOpen(false)}
+        products={products}
+        customer={customer}
+        initialProduct={whatsAppInitialProduct}
+        initialLinkOrText={whatsAppInitialText}
       />
 
       {/* Google Gemini Specification Prompt Modal */}

@@ -14,6 +14,9 @@ import {
   Circle,
   Sparkles,
   Info,
+  MessageSquare,
+  Share2,
+  Check,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -23,6 +26,7 @@ interface ProductDetailModalProps {
   onClose: () => void;
   onAddToCart: (product: Product, variant?: ProductVariant) => void;
   onUpdateQuantity: (cartItemId: string, delta: number) => void;
+  onOpenWhatsAppChat?: (product: Product) => void;
 }
 
 export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
@@ -31,8 +35,10 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   onClose,
   onAddToCart,
   onUpdateQuantity,
+  onOpenWhatsAppChat,
 }) => {
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [copiedLink, setCopiedLink] = useState(false);
 
   useEffect(() => {
     if (product?.has_variants && product.variants && product.variants.length > 0) {
@@ -274,7 +280,45 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
             </div>
 
             {/* Action Buttons */}
-            <div>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                type="button"
+                onClick={() => {
+                  const prodUrl = `${window.location.origin}${window.location.pathname}?product=${product.id}`;
+                  navigator.clipboard.writeText(prodUrl);
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 2000);
+                }}
+                className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-200/90 px-3.5 py-3 rounded-2xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs"
+                title="Salin link produk"
+              >
+                {copiedLink ? (
+                  <>
+                    <Check className="w-4 h-4 text-emerald-600" />
+                    <span>Tersalin!</span>
+                  </>
+                ) : (
+                  <>
+                    <Share2 className="w-4 h-4 text-slate-500" />
+                    <span>Salin Link</span>
+                  </>
+                )}
+              </button>
+
+              {onOpenWhatsAppChat && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onOpenWhatsAppChat(product);
+                  }}
+                  className="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 px-3.5 py-3 rounded-2xl text-xs font-bold flex items-center space-x-1.5 transition-all cursor-pointer shadow-2xs"
+                  title="Tanyakan detail produk ini ke Admin via WhatsApp"
+                >
+                  <MessageSquare className="w-4 h-4 text-emerald-600" />
+                  <span>Tanya Admin WA</span>
+                </button>
+              )}
+
               {currentCartQty > 0 ? (
                 <div className="flex items-center justify-between sm:justify-end space-x-3 bg-emerald-50 border border-emerald-200 rounded-2xl p-1.5">
                   <div className="px-2 text-xs font-bold text-emerald-900 hidden sm:block">
@@ -305,7 +349,7 @@ export const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
                 <button
                   onClick={() => onAddToCart(product, selectedVariant || undefined)}
                   disabled={isOutOfStock}
-                  className="w-full sm:w-auto flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-6 py-3.5 rounded-2xl text-xs sm:text-sm font-bold shadow-md shadow-emerald-200 transition-all cursor-pointer disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed"
+                  className="flex-1 sm:flex-initial flex items-center justify-center space-x-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-5 py-3.5 rounded-2xl text-xs sm:text-sm font-bold shadow-md shadow-emerald-200 transition-all cursor-pointer disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none disabled:cursor-not-allowed"
                 >
                   <ShoppingBag className="w-4 h-4" />
                   <span>
