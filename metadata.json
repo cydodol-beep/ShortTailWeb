@@ -1,0 +1,6 @@
+{
+  "name": "ShortTail Web Store",
+  "description": "Mobile-responsive self-service store web application for customers to browse products, manage cart, and submit orders integrated with Supabase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
