@@ -332,14 +332,14 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
     setDetectingLocation(true);
     let handled = false;
 
-    // Timeout safety fallback after 5 seconds so user is never stuck
+    // Timeout safety fallback after 10 seconds so user is never stuck
     const timer = setTimeout(() => {
       if (!handled) {
         handled = true;
         setDetectingLocation(false);
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       }
-    }, 5000);
+    }, 10000);
 
     navigator.geolocation.getCurrentPosition(
       (pos) => {
@@ -365,7 +365,7 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
         // Still proceed to WhatsApp without GPS coordinates
         window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
       },
-      { timeout: 4500, enableHighAccuracy: true, maximumAge: 60000 }
+      { timeout: 10000, enableHighAccuracy: true, maximumAge: 60000 }
     );
   };
 

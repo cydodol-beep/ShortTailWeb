@@ -425,7 +425,7 @@ export const CustomerValidation: React.FC<CustomerValidationProps> = ({
 
       {/* Footer */}
       <div className="text-center text-xs text-slate-400 py-4 flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
-        <span>&copy; {new Date().getFullYear()} {storeName} POS Integration</span>
+        <span>&copy; {new Date().getFullYear()} {storeName} POS Integration &bull; Version 2</span>
       </div>
     </div>
   );
