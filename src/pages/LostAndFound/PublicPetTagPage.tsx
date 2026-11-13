@@ -15,6 +15,7 @@ import {
 import { supabase } from '../../lib/supabase';
 import { Customer, PetData } from '../../types';
 import { normalizePhoneNumber } from '../../lib/utils';
+import { detectOneTimeGps, dispatchWhatsAppUrl } from '../../lib/gpsWhatsApp';
 
 interface PublicPetTagPageProps {
   brandName?: string;
@@ -29,6 +30,9 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
   const [copiedLink, setCopiedLink] = useState(false);
   const [locationAddress, setLocationAddress] = useState<string>('');
   const [detectingLocation, setDetectingLocation] = useState(false);
+  const [gpsAttempted, setGpsAttempted] = useState(false);
+  const [preparedWaUrl, setPreparedWaUrl] = useState<string | null>(null);
+  const [gpsFeedback, setGpsFeedback] = useState<string | null>(null);
   const [customFinderMessage, setCustomFinderMessage] = useState<string>('');
 
   // Loaded Pet Data
@@ -175,62 +179,68 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
   const targetWhatsAppNumber = getWhatsAppTargetPhone(pet.ownerPhone);
   const whatsappUrl = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText())}`;
 
-  // One-time GPS detection & dispatch WhatsApp message
+  // One-time GPS detection & dispatch WhatsApp message (iOS & Android cross-platform)
   const handleSendWhatsAppWithOptionalGPS = (e?: React.MouseEvent) => {
-    if (e) e.preventDefault();
-
-    if (!pet.enable_gps_sharing) {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-
-    if (locationAddress) {
-      const directUrl = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText(locationAddress))}`;
-      window.open(directUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-
-    if (!navigator.geolocation) {
-      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      return;
-    }
-
-    setDetectingLocation(true);
-    let handled = false;
-
-    // Timeout safety fallback after 10 seconds so user is never stuck
-    const timer = setTimeout(() => {
-      if (!handled) {
-        handled = true;
-        setDetectingLocation(false);
-        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
+    if (!pet.enable_gps_sharing || locationAddress || gpsAttempted) {
+      if (e) e.preventDefault();
+      const readyUrl = locationAddress
+        ? `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText(locationAddress))}`
+        : whatsappUrl;
+      const opened = dispatchWhatsAppUrl(readyUrl);
+      if (!opened) {
+        setPreparedWaUrl(readyUrl);
       }
-    }, 10000);
+      return;
+    }
 
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        if (handled) return;
-        handled = true;
-        clearTimeout(timer);
-        const lat = pos.coords.latitude.toFixed(5);
-        const lng = pos.coords.longitude.toFixed(5);
-        const locText = `https://maps.google.com/?q=${lat},${lng} (Lat: ${lat}, Lng: ${lng})`;
-        setLocationAddress(locText);
-        setDetectingLocation(false);
+    if (e) e.preventDefault();
+    setDetectingLocation(true);
+    setGpsFeedback(null);
 
-        const targetUrlWithGPS = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText(locText))}`;
-        window.open(targetUrlWithGPS, '_blank', 'noopener,noreferrer');
-      },
-      (err) => {
-        if (handled) return;
-        handled = true;
-        clearTimeout(timer);
-        console.warn('GPS detection denied or timed out:', err.message);
-        setDetectingLocation(false);
-        window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-      },
-      { timeout: 10000, enableHighAccuracy: true, maximumAge: 60000 }
-    );
+    // Must be invoked synchronously inside user click so iOS Safari & Android WebView preserve gesture token
+    detectOneTimeGps((result) => {
+      setDetectingLocation(false);
+      setGpsAttempted(true);
+
+      let finalUrl = whatsappUrl;
+      if (result.success && result.locationText) {
+        setLocationAddress(result.locationText);
+        finalUrl = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText(result.locationText))}`;
+        setGpsFeedback('✓ Lokasi GPS terlampir! Membuka WhatsApp...');
+      } else if (result.reason === 'permission_denied') {
+        setGpsFeedback('Akses lokasi tidak diizinkan. Pesan siap dikirim tanpa koordinat GPS.');
+      } else if (result.reason === 'insecure_context') {
+        setGpsFeedback('Koneksi non-HTTPS tidak mendukung GPS. Pesan siap dikirim tanpa koordinat.');
+      } else {
+        setGpsFeedback('Sinyal GPS tidak tersedia saat ini. Pesan siap dikirim tanpa koordinat.');
+      }
+
+      setPreparedWaUrl(finalUrl);
+      dispatchWhatsAppUrl(finalUrl);
+    });
+  };
+
+  const handleRetryGpsDetection = () => {
+    setLocationAddress('');
+    setGpsAttempted(false);
+    setPreparedWaUrl(null);
+    setGpsFeedback(null);
+    setDetectingLocation(true);
+
+    detectOneTimeGps((result) => {
+      setDetectingLocation(false);
+      setGpsAttempted(true);
+
+      let finalUrl = whatsappUrl;
+      if (result.success && result.locationText) {
+        setLocationAddress(result.locationText);
+        finalUrl = `https://wa.me/${targetWhatsAppNumber}?text=${encodeURIComponent(createWhatsAppMessageText(result.locationText))}`;
+        setGpsFeedback('✓ Lokasi GPS berhasil dideteksi & dilampirkan!');
+      } else {
+        setGpsFeedback('Lokasi GPS tetap tidak tersedia. Pastikan izin lokasi browser aktif.');
+      }
+      setPreparedWaUrl(finalUrl);
+    });
   };
 
   const handleCopyTagUrl = () => {
@@ -330,18 +340,33 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
 
             {/* Action Button: "Text my owner" */}
             <div className="px-5 pt-3 pb-2 flex items-center justify-center relative z-10">
-              <button
-                type="button"
-                onClick={handleSendWhatsAppWithOptionalGPS}
-                disabled={detectingLocation}
-                className="w-full py-3 px-5 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-md border border-slate-200/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 cursor-pointer whitespace-nowrap group disabled:opacity-75"
-                title={`Kirim Pesan WhatsApp ke ${pet.ownerName}`}
-              >
-                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                  {detectingLocation ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageSquare className="w-3.5 h-3.5" />}
-                </span>
-                <span>{detectingLocation ? 'Mendeteksi Lokasi...' : 'Text my owner'}</span>
-              </button>
+              {(!pet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-3 px-5 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-md border border-slate-200/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 cursor-pointer whitespace-nowrap group"
+                  title={`Kirim Pesan WhatsApp ke ${pet.ownerName}`}
+                >
+                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <MessageSquare className="w-3.5 h-3.5" />
+                  </span>
+                  <span>Text my owner</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleSendWhatsAppWithOptionalGPS}
+                  disabled={detectingLocation}
+                  className="w-full py-3 px-5 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-md border border-slate-200/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 cursor-pointer whitespace-nowrap group disabled:opacity-75"
+                  title={`Kirim Pesan WhatsApp ke ${pet.ownerName}`}
+                >
+                  <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    {detectingLocation ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageSquare className="w-3.5 h-3.5" />}
+                  </span>
+                  <span>{detectingLocation ? 'Mendeteksi Lokasi...' : 'Text my owner'}</span>
+                </button>
+              )}
             </div>
 
             {/* Temperament / Medical Alert Pill Card */}
@@ -367,33 +392,67 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                   </span>
                 </div>
 
-                {/* Primary Direct WhatsApp CTA Button */}
-                <button
-                  type="button"
-                  onClick={handleSendWhatsAppWithOptionalGPS}
-                  disabled={detectingLocation}
-                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
-                >
-                  {detectingLocation ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-white" />
-                      <span>Mendeteksi Lokasi GPS & Membuka WhatsApp...</span>
-                    </>
-                  ) : (
-                    <>
-                      <MessageSquare className="w-4 h-4" />
-                      <span>Kirim kabar WA ke Pemilik Saya: "Saya Menemukan {pet.name}"</span>
-                    </>
-                  )}
-                </button>
+                {/* Primary Direct WhatsApp CTA Button -> Native <a> once GPS is off/resolved/attempted */}
+                {(!pet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
+                  <a
+                    href={preparedWaUrl || whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
+                  >
+                    <MessageSquare className="w-4 h-4 shrink-0" />
+                    <span>Kirim kabar WA ke Pemilik Saya: "Saya Menemukan {pet.name}"</span>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendWhatsAppWithOptionalGPS}
+                    disabled={detectingLocation}
+                    className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                  >
+                    {detectingLocation ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-white shrink-0" />
+                        <span>Mendeteksi Lokasi GPS & Membuka WhatsApp...</span>
+                      </>
+                    ) : (
+                      <>
+                        <MessageSquare className="w-4 h-4 shrink-0" />
+                        <span>Kirim kabar WA ke Pemilik Saya: "Saya Menemukan {pet.name}"</span>
+                      </>
+                    )}
+                  </button>
+                )}
 
-                <div className="flex flex-col items-center gap-1">
+                <div className="flex flex-col items-center gap-1.5">
                   {pet.enable_gps_sharing && (
-                    <span className="text-[10px] text-sky-700 bg-sky-50 px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border border-sky-200">
-                      <MapPin className="w-3 h-3 text-sky-600" />
-                      <span>One-Time GPS Sharing Aktif</span>
-                    </span>
+                    <div className="flex flex-wrap items-center justify-center gap-1.5">
+                      <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border ${
+                        locationAddress
+                          ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                          : 'text-sky-700 bg-sky-50 border-sky-200'
+                      }`}>
+                        <MapPin className={`w-3 h-3 ${locationAddress ? 'text-emerald-600' : 'text-sky-600'}`} />
+                        <span>{locationAddress ? 'Lokasi GPS Terlampir ✓' : 'One-Time GPS Sharing Aktif'}</span>
+                      </span>
+                      {gpsAttempted && !locationAddress && !detectingLocation && (
+                        <button
+                          type="button"
+                          onClick={handleRetryGpsDetection}
+                          className="text-[10px] text-sky-700 hover:text-sky-900 underline font-semibold cursor-pointer"
+                        >
+                          Deteksi ulang GPS
+                        </button>
+                      )}
+                    </div>
                   )}
+
+                  {gpsFeedback && (
+                    <p className="text-[10px] text-sky-800 bg-sky-50/90 border border-sky-200/80 px-2.5 py-1 rounded-lg text-center font-medium">
+                      {gpsFeedback}
+                    </p>
+                  )}
+
                   <p className="text-[10px] text-slate-400 text-center leading-relaxed">
                     Pesan penemuan {pet.name} akan langsung terbuka di WhatsApp nomor pemilik <strong>{pet.ownerPhone}</strong>.
                   </p>
