@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function() {
+        try {
+          var originalFetch = window.fetch;
+          var _fetch = originalFetch;
+          Object.defineProperty(window, 'fetch', {
+            get: function() {
+              return _fetch;
+            },
+            set: function(val) {
+              _fetch = val;
+            },
+            configurable: true,
+            enumerable: true,
+          });
+        } catch (e) {
+          // ignore
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Healthy Treats for Every Anabul</title>
+    <meta name="description" content="Healthy Treats for Every Anabul - ShortTail" />
+    <meta property="og:title" content="Healthy Treats for Every Anabul" />
+    <meta property="og:description" content="Healthy Treats for Every Anabul - ShortTail" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+
