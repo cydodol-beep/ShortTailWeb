@@ -491,7 +491,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
         <div className="mt-6 text-center space-y-2 text-xs text-slate-500">
 
           <p className="text-[11px] text-slate-400">
-            Layanan Smart Pet Tag Darurat Lost & Found dipersembahkan oleh{' '}
+            Layanan Smart Tag Darurat Lost & Found dipersembahkan oleh{' '}
             <a
               href="https://shorttail.id"
               target="_blank"
