@@ -271,13 +271,13 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
             <p className="text-xs text-slate-500 font-bold">Memuat Data Tag Darurat Anabul...</p>
           </div>
         ) : (
-          /* Physical Tag Container - View-Only (Warm Cream, Stone Arch & Petrol Teal Theme) */
-          <div className="w-full bg-[#F6F6F0] rounded-[36px] overflow-hidden shadow-2xl border-4 border-white relative flex flex-col">
+          /* Physical Tag Container - View-Only (Warm Paper, Terracotta & Sage Theme 3) */
+          <div className="w-full bg-[#F7F5F0] rounded-[36px] overflow-hidden shadow-2xl border-4 border-[#FDFBF7] relative flex flex-col">
             
             {/* Paw Print Decorative Background Watermarks */}
             <svg
               viewBox="0 0 36 36"
-              className="w-8 h-8 absolute top-5 left-5 text-[#CECABD] -rotate-12 pointer-events-none select-none"
+              className="w-8 h-8 absolute top-5 left-5 text-[#CBC0AE] -rotate-12 pointer-events-none select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
               fill="currentColor"
               aria-hidden="true"
             >
@@ -289,7 +289,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
             </svg>
             <svg
               viewBox="0 0 36 36"
-              className="w-8 h-8 absolute top-11 right-5 text-[#CECABD] rotate-12 pointer-events-none select-none"
+              className="w-8 h-8 absolute top-11 right-5 text-[#CBC0AE] rotate-12 pointer-events-none select-none drop-shadow-[0_1px_1px_rgba(255,255,255,0.8)]"
               fill="currentColor"
               aria-hidden="true"
             >
@@ -301,43 +301,31 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
             </svg>
 
             {/* Top Header Section */}
-            <div className="pt-7 pb-3 text-center px-6 relative z-10">
+            <div className="pt-7 pb-2 text-center px-6 relative z-10">
               {/* Tag Number Identifier */}
-              <div className="inline-block mb-1.5 px-3 py-0.5 bg-[#C5DEF4] text-[#24556F] font-extrabold text-[10px] rounded-full uppercase tracking-wider">
+              <div className="inline-block mb-2 px-3.5 py-0.5 bg-[#E3DACD] text-[#4A3728] border border-[#D7CBB9] font-extrabold text-[10px] rounded-full uppercase tracking-wider shadow-2xs">
                 {pet.tagBadgeText?.trim() || `Smart Collar Tag #${pet.tag_number}`}
               </div>
 
               {/* Cursive Handwriting Header: "Hello, my name is" */}
               <p 
-                className="text-2xl sm:text-[28px] text-[#232A31] tracking-wide mb-0.5 select-none"
+                className="text-2xl sm:text-[28px] text-[#5C4433] tracking-wide mb-0.5 select-none"
                 style={{ fontFamily: "'Caveat', cursive, serif" }}
               >
                 {pet.subtitle}
               </p>
 
               {/* Giant Friendly Pet Name */}
-              <h1 className="text-5xl sm:text-6xl font-black text-[#24556F] tracking-tight leading-none select-none">
+              <h1 className="text-5xl sm:text-6xl font-black text-[#BE7856] tracking-tight leading-none select-none">
                 {pet.name}
               </h1>
             </div>
 
-            {/* Smooth Curved Stone Arch Layer containing Pet Photo */}
-            <div className="relative pt-8 pb-8 flex flex-col items-center justify-center">
-              <svg
-                viewBox="0 0 400 220"
-                preserveAspectRatio="none"
-                className="absolute inset-0 w-full h-full pointer-events-none select-none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M 0,195 Q 200,-155 400,195 L 400,220 L 0,220 Z"
-                  fill="#E5E3D9"
-                />
-              </svg>
-
+            {/* Pet Photo Avatar & Curved Handwritten Note */}
+            <div className="relative pt-4 pb-8 flex flex-col items-center justify-center">
               {/* Center Circular Pet Avatar Container (Pure view, no edit controls) */}
               <div className="relative z-10 flex items-center justify-center">
-                <div className="relative z-20 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#9BA79A]">
+                <div className="relative z-20 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-[5px] border-[#EAE3D7] ring-2 ring-[#C9BCAB] shadow-[0_6px_18px_rgba(92,68,51,0.16)] overflow-hidden bg-[#DED4C4]">
                   <img
                     src={pet.photoUrl}
                     alt={pet.name}
@@ -361,7 +349,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                       d="M 28,128 A 92,92 0 0,0 212,128"
                       fill="none"
                     />
-                    <text className="fill-[#232A31] font-bold text-[15px] select-none tracking-wide" style={{ fontFamily: "'Caveat', cursive, serif" }}>
+                    <text className="fill-[#4A3728] font-bold text-[15px] select-none tracking-wide" style={{ fontFamily: "'Caveat', cursive, serif" }}>
                       <textPath href="#public-tag-curve-path" startOffset="50%" textAnchor="middle">
                         {pet.noteText}
                       </textPath>
@@ -371,8 +359,8 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
               </div>
             </div>
 
-            {/* Lower Warm Stone Body */}
-            <div className="bg-[#E5E3D9] pt-1 pb-2 relative z-10 flex flex-col">
+            {/* Lower Warm Paper Body */}
+            <div className="pt-1 pb-2 relative z-10 flex flex-col">
               {/* Action Button: "Tombol Darurat" */}
               <div className="px-5 pt-1 pb-2.5 flex items-center justify-center relative z-10">
                 {(!pet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
@@ -380,49 +368,57 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                     href={whatsappUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full py-3 px-5 bg-[#DC2626] hover:bg-[#B91C1C] active:bg-[#991B1B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-md shadow-red-600/25 border border-red-700/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group"
+                    className="relative w-full py-3 px-5 bg-[#BD7858] hover:bg-[#AA6748] active:bg-[#97583B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-[0_4px_14px_rgba(220,38,38,0.35)] border border-[#DC2626]/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group"
                     title={`Kirim Pesan WhatsApp Darurat ke ${pet.ownerName}`}
                   >
-                    <span className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-[#DC2626] transition-colors">
-                      <Siren className="w-4 h-4" />
+                    <span className="absolute -inset-0.5 rounded-full ring-2 ring-red-500/75 animate-pulse motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#DC2626]/80 via-[#EF4444]/85 to-[#DC2626]/80 animate-pulse motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                    <span className="relative z-10 w-7 h-7 rounded-full bg-[#E3D7C4] text-[#991B1B] flex items-center justify-center shrink-0 group-hover:bg-[#FDFBF7] group-hover:text-[#DC2626] transition-colors shadow-2xs">
+                      <span className="absolute inset-0 rounded-full bg-red-400/75 animate-ping motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                      <Siren className="relative z-10 w-4 h-4" />
                     </span>
-                    <span>{pet.textOwnerButtonLabel?.trim() || 'Tombol Darurat'}</span>
+                    <span className="relative z-10">{pet.textOwnerButtonLabel?.trim() || 'Tombol Darurat'}</span>
                   </a>
                 ) : (
                   <button
                     type="button"
                     onClick={handleSendWhatsAppWithOptionalGPS}
                     disabled={detectingLocation}
-                    className="w-full py-3 px-5 bg-[#DC2626] hover:bg-[#B91C1C] active:bg-[#991B1B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-md shadow-red-600/25 border border-red-700/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group disabled:opacity-75"
+                    className="relative w-full py-3 px-5 bg-[#BD7858] hover:bg-[#AA6748] active:bg-[#97583B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-[0_4px_14px_rgba(220,38,38,0.35)] border border-[#DC2626]/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group disabled:opacity-75"
                     title={`Kirim Pesan WhatsApp Darurat ke ${pet.ownerName}`}
                   >
-                    <span className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-[#DC2626] transition-colors">
-                      {detectingLocation ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Siren className="w-4 h-4" />}
+                    <span className="absolute -inset-0.5 rounded-full ring-2 ring-red-500/75 animate-pulse motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                    <span className="absolute inset-0 rounded-full bg-gradient-to-r from-[#DC2626]/80 via-[#EF4444]/85 to-[#DC2626]/80 animate-pulse motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                    <span className="relative z-10 w-7 h-7 rounded-full bg-[#E3D7C4] text-[#991B1B] flex items-center justify-center shrink-0 group-hover:bg-[#FDFBF7] group-hover:text-[#DC2626] transition-colors shadow-2xs">
+                      {!detectingLocation && (
+                        <span className="absolute inset-0 rounded-full bg-red-400/75 animate-ping motion-reduce:animate-none pointer-events-none" aria-hidden="true" />
+                      )}
+                      {detectingLocation ? <RefreshCw className="relative z-10 w-4 h-4 animate-spin" /> : <Siren className="relative z-10 w-4 h-4" />}
                     </span>
-                    <span>{detectingLocation ? 'Mendeteksi Lokasi...' : (pet.textOwnerButtonLabel?.trim() || 'Tombol Darurat')}</span>
+                    <span className="relative z-10">{detectingLocation ? 'Mendeteksi Lokasi...' : (pet.textOwnerButtonLabel?.trim() || 'Tombol Darurat')}</span>
                   </button>
                 )}
               </div>
 
               {/* Temperament / Medical Alert Pill Card */}
               <div className="px-5 py-2 relative z-10">
-                <div className="w-full bg-[#CBDCE3] border border-[#BACED7] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-2xs">
-                  <div className="w-8 h-8 rounded-full bg-[#779BAE] text-white flex items-center justify-center shrink-0 shadow-xs">
+                <div className="w-full bg-[#ECE7DF] border border-[#DDD5C7] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-2xs">
+                  <div className="w-8 h-8 rounded-full bg-[#BD7858] text-white flex items-center justify-center shrink-0 shadow-xs">
                     <Activity className="w-4 h-4" />
                   </div>
-                  <div className="text-xs sm:text-sm leading-snug text-[#273844]">
-                    <strong className="font-extrabold text-[#1E2932]">{pet.temperamentTitle}</strong>{' '}
-                    <span className="font-medium text-[#374854]">{pet.temperamentDesc}</span>
+                  <div className="text-xs sm:text-sm leading-snug text-[#5A4636]">
+                    <strong className="font-extrabold text-[#3B2A1E]">{pet.temperamentTitle}</strong>{' '}
+                    <span className="font-medium text-[#5A4636]">{pet.temperamentDesc}</span>
                   </div>
                 </div>
               </div>
 
               {/* Direct WhatsApp CTA Button Highlight Card (Sending WhatsApp message to owner) */}
               <div className="px-5 pb-4 pt-2.5 relative z-10">
-                <div className="bg-white rounded-2xl p-4 border border-[#ECEAE1] shadow-[0_6px_18px_rgba(0,0,0,0.06)] space-y-3">
-                  <div className="flex items-center justify-between text-xs font-extrabold text-[#1E2932]">
+                <div className="bg-[#FCFBF8] rounded-2xl p-4 border border-[#E4DDD0] shadow-[0_6px_18px_rgba(92,68,51,0.08)] space-y-3">
+                  <div className="flex items-center justify-between text-xs font-extrabold text-[#3B2A1E]">
                     <span className="flex items-center gap-1.5">
-                      <Sparkles className="w-4 h-4 text-[#D9822B]" />
+                      <Sparkles className="w-4 h-4 text-[#C68642]" />
                       Kirim Pesan WhatsApp ke Pemilik
                     </span>
                   </div>
@@ -433,7 +429,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                       href={preparedWaUrl || whatsappUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="w-full py-3 px-4 bg-[#1FA845] hover:bg-[#19933B] active:bg-[#157D31] text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-700/15 transition-all flex items-center justify-center gap-2.5 cursor-pointer text-center"
+                      className="w-full py-3 px-4 bg-[#768E75] hover:bg-[#647B63] active:bg-[#556A54] text-white font-extrabold text-sm rounded-2xl shadow-[0_4px_12px_rgba(90,115,88,0.28)] border border-[#688067] transition-all flex items-center justify-center gap-2.5 cursor-pointer text-center"
                     >
                       <MessageSquare className="w-4 h-4 shrink-0" />
                       <span>
@@ -447,7 +443,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                       type="button"
                       onClick={handleSendWhatsAppWithOptionalGPS}
                       disabled={detectingLocation}
-                      className="w-full py-3 px-4 bg-[#1FA845] hover:bg-[#19933B] active:bg-[#157D31] text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-700/15 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-75 text-center"
+                      className="w-full py-3 px-4 bg-[#768E75] hover:bg-[#647B63] active:bg-[#556A54] text-white font-extrabold text-sm rounded-2xl shadow-[0_4px_12px_rgba(90,115,88,0.28)] border border-[#688067] transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-75 text-center"
                     >
                       {detectingLocation ? (
                         <>
@@ -472,17 +468,17 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                       <div className="flex flex-wrap items-center justify-center gap-1.5">
                         <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 border ${
                           locationAddress
-                            ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
-                            : 'text-[#1D5477] bg-[#DBEBF8] border-[#BDD7EC]'
+                            ? 'text-[#355234] bg-[#E5EDE4] border-[#C6D6C4]'
+                            : 'text-[#4A3728] bg-[#E8DFD1] border-[#D7CBB8]'
                         }`}>
-                          <MapPin className={`w-3 h-3 ${locationAddress ? 'text-emerald-600' : 'text-[#24556F]'}`} />
+                          <MapPin className={`w-3 h-3 ${locationAddress ? 'text-[#4E734C]' : 'text-[#8C5A3C]'}`} />
                           <span>{locationAddress ? 'Lokasi GPS Terlampir ✓' : 'One-Time GPS Sharing Aktif'}</span>
                         </span>
                         {gpsAttempted && !locationAddress && !detectingLocation && (
                           <button
                             type="button"
                             onClick={handleRetryGpsDetection}
-                            className="text-[10px] text-[#24556F] hover:text-[#1A4358] underline font-semibold cursor-pointer"
+                            className="text-[10px] text-[#8C5A3C] hover:text-[#4A3728] underline font-semibold cursor-pointer"
                           >
                             Deteksi ulang GPS
                           </button>
@@ -491,13 +487,13 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                     )}
 
                     {gpsFeedback && (
-                      <p className="text-[10px] text-[#1D5477] bg-[#EAF4FC] border border-[#BDD7EC] px-2.5 py-1 rounded-lg text-center font-medium">
+                      <p className="text-[10px] text-[#4A3728] bg-[#F2ECE2] border border-[#DDD3C3] px-2.5 py-1 rounded-lg text-center font-medium">
                         {gpsFeedback}
                       </p>
                     )}
 
-                    <p className="text-[11px] text-[#5B646D] text-center leading-relaxed">
-                      Pesan penemuan {pet.name} akan langsung terbuka di WhatsApp nomor pemilik <strong className="text-[#1E2932]">{pet.ownerPhone}</strong>.
+                    <p className="text-[11px] text-[#5C4B3E] text-center leading-relaxed">
+                      Pesan penemuan {pet.name} akan langsung terbuka di WhatsApp nomor pemilik <strong className="text-[#3B2A1E]">{pet.ownerPhone}</strong>.
                     </p>
                   </div>
                 </div>
@@ -505,8 +501,8 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
             </div>
 
             {/* Bottom Strip: "TAP. CONNECT. GET ME HOME." */}
-            <div className="bg-[#1A4358] text-white py-3.5 px-4 text-center text-[11px] sm:text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2.5 select-none">
-              <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#CBDCE3]" fill="currentColor" aria-hidden="true">
+            <div className="bg-[#9F4716] text-[#FDFBF7] py-3.5 px-4 text-center text-[11px] sm:text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2.5 select-none">
+              <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#E8D5C4]" fill="currentColor" aria-hidden="true">
                 <circle cx="10" cy="11" r="2.6" />
                 <circle cx="16.5" cy="8.5" r="2.6" />
                 <circle cx="23" cy="10.5" r="2.6" />
@@ -514,7 +510,7 @@ export const PublicPetTagPage: React.FC<PublicPetTagPageProps> = ({
                 <path d="M18 14.5c-4.3 0-7.5 3.3-7.5 6.8 0 2.4 1.8 4.2 4.2 4.2 1.2 0 2.2-.5 3.3-.5s2.1.5 3.3.5c2.4 0 4.2-1.8 4.2-4.2 0-3.5-3.2-6.8-7.5-6.8z" />
               </svg>
               <span>TAP. CONNECT. GET ME HOME.</span>
-              <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#CBDCE3]" fill="currentColor" aria-hidden="true">
+              <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#E8D5C4]" fill="currentColor" aria-hidden="true">
                 <circle cx="10" cy="11" r="2.6" />
                 <circle cx="16.5" cy="8.5" r="2.6" />
                 <circle cx="23" cy="10.5" r="2.6" />
