@@ -27,7 +27,8 @@ import {
   X, 
   HelpCircle,
   Camera,
-  Upload
+  Upload,
+  Siren
 } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { Customer, PetData } from '../../types';
@@ -717,49 +718,73 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
           </div>
         )}
 
-        {/* Physical Tag Container with Soft Shadow & Border (Matches Uploaded Screenshot) */}
-        <div className="w-full bg-[#EAF4FC] rounded-[36px] overflow-hidden shadow-2xl border-4 border-white/80 relative flex flex-col">
+        {/* Physical Tag Container with Soft Shadow & Border (Warm Cream, Stone Arch & Petrol Teal Theme) */}
+        <div className="w-full bg-[#F6F6F0] rounded-[36px] overflow-hidden shadow-2xl border-4 border-white relative flex flex-col">
           
           {/* Paw Print Decorative Background Watermarks */}
-          <div className="absolute top-6 left-6 text-sky-200/50 pointer-events-none select-none text-3xl font-mono">
-            🐾
-          </div>
-          <div className="absolute top-12 right-6 text-sky-200/50 pointer-events-none select-none text-3xl font-mono">
-            🐾
-          </div>
-          <div className="absolute bottom-32 left-8 text-sky-200/50 pointer-events-none select-none text-3xl font-mono">
-            🐾
-          </div>
+          <svg
+            viewBox="0 0 36 36"
+            className="w-8 h-8 absolute top-5 left-5 text-[#CECABD] -rotate-12 pointer-events-none select-none"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <circle cx="10" cy="11" r="2.6" />
+            <circle cx="16.5" cy="8.5" r="2.6" />
+            <circle cx="23" cy="10.5" r="2.6" />
+            <circle cx="26.5" cy="16" r="2.4" />
+            <path d="M18 14.5c-4.3 0-7.5 3.3-7.5 6.8 0 2.4 1.8 4.2 4.2 4.2 1.2 0 2.2-.5 3.3-.5s2.1.5 3.3.5c2.4 0 4.2-1.8 4.2-4.2 0-3.5-3.2-6.8-7.5-6.8z" />
+          </svg>
+          <svg
+            viewBox="0 0 36 36"
+            className="w-8 h-8 absolute top-11 right-5 text-[#CECABD] rotate-12 pointer-events-none select-none"
+            fill="currentColor"
+            aria-hidden="true"
+          >
+            <circle cx="10" cy="11" r="2.6" />
+            <circle cx="16.5" cy="8.5" r="2.6" />
+            <circle cx="23" cy="10.5" r="2.6" />
+            <circle cx="26.5" cy="16" r="2.4" />
+            <path d="M18 14.5c-4.3 0-7.5 3.3-7.5 6.8 0 2.4 1.8 4.2 4.2 4.2 1.2 0 2.2-.5 3.3-.5s2.1.5 3.3.5c2.4 0 4.2-1.8 4.2-4.2 0-3.5-3.2-6.8-7.5-6.8z" />
+          </svg>
 
-          {/* Top Wavy Header Section */}
-          <div className="pt-8 pb-3 text-center px-6 relative z-10">
+          {/* Top Header Section */}
+          <div className="pt-7 pb-3 text-center px-6 relative z-10">
             {/* Tag Sequence Badge */}
-            <div className="inline-block mb-1 px-2.5 py-0.5 bg-sky-200/60 text-[#1E5186] font-extrabold text-[10px] rounded-full uppercase tracking-wider">
+            <div className="inline-block mb-1.5 px-3 py-0.5 bg-[#C5DEF4] text-[#24556F] font-extrabold text-[10px] rounded-full uppercase tracking-wider">
               {currentPet.tagBadgeText?.trim() || `Smart Pet Tag #${currentPet.tag_number} of ${petsList.length}`}
             </div>
 
             {/* Cursive Handwriting Header: "Hello, my name is" */}
             <p 
-              className="text-2xl sm:text-3xl text-slate-700 tracking-wide mb-1 select-none"
+              className="text-2xl sm:text-[28px] text-[#232A31] tracking-wide mb-0.5 select-none"
               style={{ fontFamily: "'Caveat', cursive, serif" }}
             >
               {currentPet.subtitle}
             </p>
 
             {/* Giant Friendly Pet Name */}
-            <h1 className="text-5xl sm:text-6xl font-black text-[#5B9BD5] tracking-tight drop-shadow-xs select-none">
+            <h1 className="text-5xl sm:text-6xl font-black text-[#24556F] tracking-tight leading-none select-none">
               {currentPet.name}
             </h1>
           </div>
 
-          {/* Organic Darker Wavy Mid-Layer containing Pet Photo */}
-          <div className="relative mt-1 mb-3">
-            
-            {/* Background Wavy SVG Layer */}
-            <div className="w-full h-48 sm:h-52 bg-gradient-to-b from-[#2E6B9E] via-[#2A6596] to-[#255883] rounded-t-[54px] rounded-b-[54px] flex flex-col items-center justify-center relative shadow-inner overflow-visible">
-              
-              {/* Center Circular Pet Avatar Container with quick edit overlay for owner */}
-              <div className="relative z-20 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-xl overflow-hidden bg-slate-900 group">
+          {/* Smooth Curved Stone Arch Layer containing Pet Photo */}
+          <div className="relative pt-8 pb-8 flex flex-col items-center justify-center">
+            <svg
+              viewBox="0 0 400 220"
+              preserveAspectRatio="none"
+              className="absolute inset-0 w-full h-full pointer-events-none select-none"
+              aria-hidden="true"
+            >
+              <path
+                d="M 0,195 Q 200,-155 400,195 L 400,220 L 0,220 Z"
+                fill="#E5E3D9"
+              />
+            </svg>
+
+            {/* Center Circular Pet Avatar + Curved Text */}
+            <div className="relative z-10 flex items-center justify-center">
+              <div className="relative z-20 w-36 h-36 sm:w-40 sm:h-40 rounded-full border-4 border-white shadow-lg overflow-hidden bg-[#9BA79A] group">
                 <img
                   src={currentPet.photoUrl}
                   alt={currentPet.name}
@@ -789,158 +814,172 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
 
               {/* Curved SVG Text Path hugging the bottom arc of the Avatar */}
               <div className="absolute inset-0 pointer-events-none z-30 flex items-center justify-center">
-                <svg viewBox="0 0 240 240" className="w-60 h-60 overflow-visible">
+                <svg viewBox="0 0 240 240" className="w-56 h-56 sm:w-60 sm:h-60 overflow-visible">
                   <path
                     id="pet-curve-path"
-                    d="M 28,125 A 92,92 0 0,0 212,125"
+                    d="M 28,128 A 92,92 0 0,0 212,128"
                     fill="none"
                   />
-                  <text className="fill-white font-bold text-[15px] drop-shadow-md select-none tracking-wide" style={{ fontFamily: "'Caveat', cursive, serif" }}>
+                  <text className="fill-[#232A31] font-bold text-[15px] select-none tracking-wide" style={{ fontFamily: "'Caveat', cursive, serif" }}>
                     <textPath href="#pet-curve-path" startOffset="50%" textAnchor="middle">
                       {currentPet.noteText}
                     </textPath>
                   </text>
                 </svg>
               </div>
-
             </div>
           </div>
 
-          {/* Action Button: "Text my owner" */}
-          <div className="px-5 pt-3 pb-2 flex items-center justify-center relative z-10">
-            {(!currentPet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full py-3 px-5 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-md border border-slate-200/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 cursor-pointer whitespace-nowrap group"
-                title={`Kirim Pesan WhatsApp ke ${effectiveOwnerName}`}
-              >
-                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                  <MessageSquare className="w-3.5 h-3.5" />
-                </span>
-                <span>{currentPet.textOwnerButtonLabel?.trim() || 'Text my owner'}</span>
-              </a>
-            ) : (
-              <button
-                type="button"
-                onClick={handleSendWhatsAppWithOptionalGPS}
-                disabled={detectingLocation}
-                className="w-full py-3 px-5 bg-white hover:bg-emerald-50 active:bg-emerald-100 text-slate-800 font-bold text-xs sm:text-sm rounded-full shadow-md border border-slate-200/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-98 cursor-pointer whitespace-nowrap group disabled:opacity-75"
-                title={`Kirim Pesan WhatsApp ke ${effectiveOwnerName}`}
-              >
-                <span className="w-6 h-6 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                  {detectingLocation ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <MessageSquare className="w-3.5 h-3.5" />}
-                </span>
-                <span>{detectingLocation ? 'Mendeteksi Lokasi...' : (currentPet.textOwnerButtonLabel?.trim() || 'Text my owner')}</span>
-              </button>
-            )}
-          </div>
-
-          {/* Temperament / Medical Alert Pill Card */}
-          <div className="px-5 py-3 relative z-10">
-            <div className="w-full bg-[#E1EEF8] border border-[#BFD9EE] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-2xs">
-              <div className="w-8 h-8 rounded-full bg-[#4682B4] text-white flex items-center justify-center shrink-0 shadow-xs">
-                <Activity className="w-4 h-4" />
-              </div>
-              <div className="text-xs sm:text-sm leading-snug text-[#2B547E]">
-                <strong className="font-extrabold text-[#1F497D]">{currentPet.temperamentTitle}</strong>{' '}
-                <span className="font-medium text-slate-700">{currentPet.temperamentDesc}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Direct WhatsApp CTA Button Highlight Card (Sending WhatsApp message to member phone) */}
-          <div className="px-5 pb-5 pt-3 relative z-10">
-            <div className="bg-white/95 backdrop-blur-xs rounded-2xl p-4 border border-sky-200/90 shadow-sm space-y-3">
-              <div className="flex items-center justify-between text-xs font-bold text-[#1E5186]">
-                <span className="flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-amber-500" />
-                  Kirim Pesan WhatsApp ke Pemilik
-                </span>
-              </div>
-
-              {/* Primary Direct WhatsApp CTA Button -> Native <a> once GPS is off/resolved/attempted, button on initial GPS trigger */}
+          {/* Lower Warm Stone Body */}
+          <div className="bg-[#E5E3D9] pt-1 pb-2 relative z-10 flex flex-col">
+            {/* Action Button: "Tombol Darurat" */}
+            <div className="px-5 pt-1 pb-2.5 flex items-center justify-center relative z-10">
               {(!currentPet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
                 <a
-                  href={preparedWaUrl || whatsappUrl}
+                  href={whatsappUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer text-center"
+                  className="w-full py-3 px-5 bg-[#DC2626] hover:bg-[#B91C1C] active:bg-[#991B1B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-md shadow-red-600/25 border border-red-700/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group"
+                  title={`Kirim Pesan WhatsApp Darurat ke ${effectiveOwnerName}`}
                 >
-                  <MessageSquare className="w-4 h-4 shrink-0" />
-                  <span>
-                    {currentPet.waCtaButtonLabel?.trim()
-                      ? currentPet.waCtaButtonLabel.replace(/\[nama_anabul\]/gi, currentPet.name)
-                      : `Kirim kabar WA ke Pemilik Saya: "Saya Menemukan ${currentPet.name}"`}
+                  <span className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-[#DC2626] transition-colors">
+                    <Siren className="w-4 h-4" />
                   </span>
+                  <span>{currentPet.textOwnerButtonLabel?.trim() || 'Tombol Darurat'}</span>
                 </a>
               ) : (
                 <button
                   type="button"
                   onClick={handleSendWhatsAppWithOptionalGPS}
                   disabled={detectingLocation}
-                  className="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-600/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-75"
+                  className="w-full py-3 px-5 bg-[#DC2626] hover:bg-[#B91C1C] active:bg-[#991B1B] text-white font-extrabold text-xs sm:text-sm rounded-full shadow-md shadow-red-600/25 border border-red-700/80 flex items-center justify-center gap-2.5 transition-all transform active:scale-[0.98] cursor-pointer whitespace-nowrap group disabled:opacity-75"
+                  title={`Kirim Pesan WhatsApp Darurat ke ${effectiveOwnerName}`}
                 >
-                  {detectingLocation ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-white shrink-0" />
-                      <span>Mendeteksi Lokasi GPS & Membuka WhatsApp...</span>
-                    </>
-                  ) : (
-                    <>
-                      <MessageSquare className="w-4 h-4 shrink-0" />
-                      <span>
-                        {currentPet.waCtaButtonLabel?.trim()
-                          ? currentPet.waCtaButtonLabel.replace(/\[nama_anabul\]/gi, currentPet.name)
-                          : `Kirim kabar WA ke Pemilik Saya: "Saya Menemukan ${currentPet.name}"`}
-                      </span>
-                    </>
-                  )}
+                  <span className="w-7 h-7 rounded-full bg-white/20 text-white flex items-center justify-center shrink-0 group-hover:bg-white group-hover:text-[#DC2626] transition-colors">
+                    {detectingLocation ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Siren className="w-4 h-4" />}
+                  </span>
+                  <span>{detectingLocation ? 'Mendeteksi Lokasi...' : (currentPet.textOwnerButtonLabel?.trim() || 'Tombol Darurat')}</span>
                 </button>
               )}
+            </div>
 
-              <div className="flex flex-col items-center gap-1.5">
-                {currentPet.enable_gps_sharing && (
-                  <div className="flex flex-wrap items-center justify-center gap-1.5">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold flex items-center gap-1 border ${
-                      locationAddress
-                        ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
-                        : 'text-sky-700 bg-sky-50 border-sky-200'
-                    }`}>
-                      <MapPin className={`w-3 h-3 ${locationAddress ? 'text-emerald-600' : 'text-sky-600'}`} />
-                      <span>{locationAddress ? 'Lokasi GPS Terlampir ✓' : 'One-Time GPS Sharing Aktif'}</span>
+            {/* Temperament / Medical Alert Pill Card */}
+            <div className="px-5 py-2 relative z-10">
+              <div className="w-full bg-[#CBDCE3] border border-[#BACED7] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-2xs">
+                <div className="w-8 h-8 rounded-full bg-[#779BAE] text-white flex items-center justify-center shrink-0 shadow-xs">
+                  <Activity className="w-4 h-4" />
+                </div>
+                <div className="text-xs sm:text-sm leading-snug text-[#273844]">
+                  <strong className="font-extrabold text-[#1E2932]">{currentPet.temperamentTitle}</strong>{' '}
+                  <span className="font-medium text-[#374854]">{currentPet.temperamentDesc}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Direct WhatsApp CTA Button Highlight Card (Sending WhatsApp message to member phone) */}
+            <div className="px-5 pb-4 pt-2.5 relative z-10">
+              <div className="bg-white rounded-2xl p-4 border border-[#ECEAE1] shadow-[0_6px_18px_rgba(0,0,0,0.06)] space-y-3">
+                <div className="flex items-center justify-between text-xs font-extrabold text-[#1E2932]">
+                  <span className="flex items-center gap-1.5">
+                    <Sparkles className="w-4 h-4 text-[#D9822B]" />
+                    Kirim Pesan WhatsApp ke Pemilik
+                  </span>
+                </div>
+
+                {/* Primary Direct WhatsApp CTA Button -> Native <a> once GPS is off/resolved/attempted, button on initial GPS trigger */}
+                {(!currentPet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
+                  <a
+                    href={preparedWaUrl || whatsappUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-full py-3 px-4 bg-[#1FA845] hover:bg-[#19933B] active:bg-[#157D31] text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-700/15 transition-all flex items-center justify-center gap-2.5 cursor-pointer text-center"
+                  >
+                    <MessageSquare className="w-4 h-4 shrink-0" />
+                    <span>
+                      {currentPet.waCtaButtonLabel?.trim()
+                        ? currentPet.waCtaButtonLabel.replace(/\[nama_anabul\]/gi, currentPet.name)
+                        : `Kirim kabar WA ke Pemilik Saya: "Saya Menemukan ${currentPet.name}"`}
                     </span>
-                    {gpsAttempted && !locationAddress && !detectingLocation && (
-                      <button
-                        type="button"
-                        onClick={handleRetryGpsDetection}
-                        className="text-[10px] text-sky-700 hover:text-sky-900 underline font-semibold cursor-pointer"
-                      >
-                        Deteksi ulang GPS
-                      </button>
+                  </a>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleSendWhatsAppWithOptionalGPS}
+                    disabled={detectingLocation}
+                    className="w-full py-3 px-4 bg-[#1FA845] hover:bg-[#19933B] active:bg-[#157D31] text-white font-extrabold text-sm rounded-xl shadow-md shadow-emerald-700/15 transition-all flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-75 text-center"
+                  >
+                    {detectingLocation ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin text-white shrink-0" />
+                        <span>Mendeteksi Lokasi GPS & Membuka WhatsApp...</span>
+                      </>
+                    ) : (
+                      <>
+                        <MessageSquare className="w-4 h-4 shrink-0" />
+                        <span>
+                          {currentPet.waCtaButtonLabel?.trim()
+                            ? currentPet.waCtaButtonLabel.replace(/\[nama_anabul\]/gi, currentPet.name)
+                            : `Kirim kabar WA ke Pemilik Saya: "Saya Menemukan ${currentPet.name}"`}
+                        </span>
+                      </>
                     )}
-                  </div>
+                  </button>
                 )}
 
-                {gpsFeedback && (
-                  <p className="text-[10px] text-sky-800 bg-sky-50/90 border border-sky-200/80 px-2.5 py-1 rounded-lg text-center font-medium">
-                    {gpsFeedback}
+                <div className="flex flex-col items-center gap-1.5">
+                  {currentPet.enable_gps_sharing && (
+                    <div className="flex flex-wrap items-center justify-center gap-1.5">
+                      <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold flex items-center gap-1 border ${
+                        locationAddress
+                          ? 'text-emerald-800 bg-emerald-50 border-emerald-200'
+                          : 'text-[#1D5477] bg-[#DBEBF8] border-[#BDD7EC]'
+                      }`}>
+                        <MapPin className={`w-3 h-3 ${locationAddress ? 'text-emerald-600' : 'text-[#24556F]'}`} />
+                        <span>{locationAddress ? 'Lokasi GPS Terlampir ✓' : 'One-Time GPS Sharing Aktif'}</span>
+                      </span>
+                      {gpsAttempted && !locationAddress && !detectingLocation && (
+                        <button
+                          type="button"
+                          onClick={handleRetryGpsDetection}
+                          className="text-[10px] text-[#24556F] hover:text-[#1A4358] underline font-semibold cursor-pointer"
+                        >
+                          Deteksi ulang GPS
+                        </button>
+                      )}
+                    </div>
+                  )}
+
+                  {gpsFeedback && (
+                    <p className="text-[10px] text-[#1D5477] bg-[#EAF4FC] border border-[#BDD7EC] px-2.5 py-1 rounded-lg text-center font-medium">
+                      {gpsFeedback}
+                    </p>
+                  )}
+
+                  <p className="text-[11px] text-[#5B646D] text-center leading-relaxed">
+                    Pesan penemuan {currentPet.name} akan langsung terbuka di WhatsApp nomor pemilik <strong className="text-[#1E2932]">{effectiveOwnerPhone}</strong>.
                   </p>
-                )}
-
-                <p className="text-[10px] text-slate-400 text-center leading-relaxed">
-                  Pesan penemuan {currentPet.name} akan langsung terbuka di WhatsApp nomor pemilik <strong>{effectiveOwnerPhone}</strong>.
-                </p>
+                </div>
               </div>
             </div>
           </div>
 
           {/* Bottom Strip: "TAP. CONNECT. GET ME HOME." */}
-          <div className="bg-[#1E5186] text-white py-3 px-4 text-center text-[11px] sm:text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2 select-none">
-            <span>🐾</span>
+          <div className="bg-[#1A4358] text-white py-3.5 px-4 text-center text-[11px] sm:text-xs font-extrabold uppercase tracking-widest flex items-center justify-center gap-2.5 select-none">
+            <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#CBDCE3]" fill="currentColor" aria-hidden="true">
+              <circle cx="10" cy="11" r="2.6" />
+              <circle cx="16.5" cy="8.5" r="2.6" />
+              <circle cx="23" cy="10.5" r="2.6" />
+              <circle cx="26.5" cy="16" r="2.4" />
+              <path d="M18 14.5c-4.3 0-7.5 3.3-7.5 6.8 0 2.4 1.8 4.2 4.2 4.2 1.2 0 2.2-.5 3.3-.5s2.1.5 3.3.5c2.4 0 4.2-1.8 4.2-4.2 0-3.5-3.2-6.8-7.5-6.8z" />
+            </svg>
             <span>TAP. CONNECT. GET ME HOME.</span>
-            <span>🐾</span>
+            <svg viewBox="0 0 36 36" className="w-3.5 h-3.5 text-[#CBDCE3]" fill="currentColor" aria-hidden="true">
+              <circle cx="10" cy="11" r="2.6" />
+              <circle cx="16.5" cy="8.5" r="2.6" />
+              <circle cx="23" cy="10.5" r="2.6" />
+              <circle cx="26.5" cy="16" r="2.4" />
+              <path d="M18 14.5c-4.3 0-7.5 3.3-7.5 6.8 0 2.4 1.8 4.2 4.2 4.2 1.2 0 2.2-.5 3.3-.5s2.1.5 3.3.5c2.4 0 4.2-1.8 4.2-4.2 0-3.5-3.2-6.8-7.5-6.8z" />
+            </svg>
           </div>
 
         </div>
@@ -1539,7 +1578,7 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
 
                 <div>
                   <label className="block font-bold text-slate-600 text-[11px] mb-1">
-                    Teks Tombol Utama ("Text my owner"):
+                    Teks Tombol Darurat ("Tombol Darurat"):
                   </label>
                   <input
                     type="text"
@@ -1549,7 +1588,7 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
                       updated[selectedPetIndex] = { ...currentPet, textOwnerButtonLabel: e.target.value };
                       setPetsList(updated);
                     }}
-                    placeholder="Text my owner"
+                    placeholder="Tombol Darurat"
                     className="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl font-medium outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
