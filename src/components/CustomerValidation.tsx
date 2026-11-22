@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
+import { getStoreSettingsCached } from '../lib/storeCache';
 import { normalizePhoneNumber, formatDisplayPhone, maskPhoneNumber, maskName, maskAddress } from '../lib/utils';
 import { Customer } from '../types';
 import { Search, UserPlus, CheckCircle2, Phone, MapPin, Building, ArrowRight, Store, ShieldCheck } from 'lucide-react';
@@ -32,17 +33,12 @@ export const CustomerValidation: React.FC<CustomerValidationProps> = ({
 
   useEffect(() => {
     if (!storeLogo) {
-      supabase
-        .from('store_settings')
-        .select('store_logo, store_name')
-        .limit(1)
-        .maybeSingle()
-        .then(({ data }) => {
-          if (data?.store_logo) setStoreLogo(data.store_logo);
-          if (data?.store_name) setStoreName(data.store_name);
-        });
+      getStoreSettingsCached().then((data) => {
+        if (data.store_logo) setStoreLogo(data.store_logo);
+        if (data.store_name) setStoreName(data.store_name);
+      });
     }
-  }, []);
+  }, [storeLogo]);
 
   const [phoneInput, setPhoneInput] = useState('628');
   const [loading, setLoading] = useState(false);

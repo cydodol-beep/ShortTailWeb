@@ -11,7 +11,7 @@ interface ProductCardProps {
   onOpenDetail: (product: Product) => void;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({
+export const ProductCard: React.FC<ProductCardProps> = React.memo(({
   product,
   quantityInCart,
   onAddToCart,
@@ -40,6 +40,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
               alt={product.name}
               className="object-contain w-full h-full group-hover:scale-105 transition-transform duration-300"
               loading="lazy"
+              decoding="async"
               onError={(e) => {
                 (e.target as HTMLElement).style.display = 'none';
               }}
@@ -162,4 +163,4 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       </div>
     </div>
   );
-};
+});

@@ -3,8 +3,14 @@
  * Integrated with Supabase POS Database
  */
 
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from './lib/supabase';
+import {
+  getStoreSettingsCached,
+  getCatalogCache,
+  setCatalogCache,
+  updateCatalogCacheProducts,
+} from './lib/storeCache';
 import { Customer, Product, ProductVariant, Category, CartItem, Order } from './types';
 import { generateCustomOrderId, isProductActive } from './lib/utils';
 import { CustomerValidation } from './components/CustomerValidation';
@@ -187,6 +193,9 @@ export default function App() {
     } catch {
       // ignore
     }
+    if (products.length === 0 && !loadingData) {
+      fetchData();
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
@@ -224,46 +233,128 @@ export default function App() {
     localStorage.setItem('shorttail_cart', JSON.stringify(cart));
   }, [cart]);
 
-  // Fetch Categories, Products, and Product Variants from Supabase
-  const fetchData = async () => {
+  // Track which product IDs have already had their Base64 images requested in this session
+  const attemptedImageIdsRef = useRef<Set<string>>(new Set());
+  const hydratingImagesRef = useRef<boolean>(false);
+
+  const hydrateProductImages = useCallback(async (sourceProducts: Product[]) => {
+    if (hydratingImagesRef.current) return;
+
+    const pendingIds = sourceProducts
+      .filter((p) => !p.main_image_url && !attemptedImageIdsRef.current.has(p.id))
+      .map((p) => p.id);
+
+    if (pendingIds.length === 0) return;
+
+    hydratingImagesRef.current = true;
+    pendingIds.forEach((id) => attemptedImageIdsRef.current.add(id));
+
+    const BATCH_SIZE = 10;
+    const CONCURRENT_WAVES = 3;
+
+    try {
+      const chunks: string[][] = [];
+      for (let i = 0; i < pendingIds.length; i += BATCH_SIZE) {
+        chunks.push(pendingIds.slice(i, i + BATCH_SIZE));
+      }
+
+      for (let i = 0; i < chunks.length; i += CONCURRENT_WAVES) {
+        const waveChunks = chunks.slice(i, i + CONCURRENT_WAVES);
+        const waveResults = await Promise.allSettled(
+          waveChunks.map((batchIds) =>
+            supabase
+              .from('products')
+              .select('id, main_image_url')
+              .in('id', batchIds)
+          )
+        );
+
+        const waveImgMap = new Map<string, string>();
+        waveResults.forEach((res) => {
+          if (res.status === 'fulfilled' && !res.value.error && res.value.data) {
+            res.value.data.forEach((row: { id: string; main_image_url?: string | null }) => {
+              if (row.main_image_url) {
+                waveImgMap.set(row.id, row.main_image_url);
+              }
+            });
+          }
+        });
+
+        if (waveImgMap.size > 0) {
+          setProducts((prev) => {
+            const next = prev.map((item) =>
+              waveImgMap.has(item.id)
+                ? { ...item, main_image_url: waveImgMap.get(item.id) }
+                : item
+            );
+            updateCatalogCacheProducts(next);
+            return next;
+          });
+        }
+      }
+    } catch (batchErr) {
+      console.warn('Product image hydration warning:', batchErr);
+    } finally {
+      hydratingImagesRef.current = false;
+    }
+  }, []);
+
+  // Fetch Categories, Products (lightweight metadata), Variants, and Store Settings from Supabase
+  const fetchData = useCallback(async (forceRefresh = false) => {
+    if (!forceRefresh) {
+      const cached = getCatalogCache();
+      if (cached) {
+        setCategories(cached.categories);
+        setProducts(cached.products);
+        setLoadingData(false);
+        getStoreSettingsCached(false).then((settings) => {
+          if (settings.store_logo) setStoreLogo(settings.store_logo);
+          if (settings.store_name) setStoreName(settings.store_name);
+        });
+        return;
+      }
+    } else {
+      attemptedImageIdsRef.current.clear();
+    }
+
     setLoadingData(true);
     setDataError(null);
 
     try {
-      // 1. Fetch Categories
-      const { data: catData, error: catErr } = await supabase
-        .from('categories')
-        .select('*')
-        .order('sort_order', { ascending: true });
+      const [catRes, prodRes, varRes, settings] = await Promise.allSettled([
+        supabase
+          .from('categories')
+          .select('*')
+          .order('sort_order', { ascending: true }),
+        supabase
+          .from('products')
+          .select('id, name, description, sku, category, category_id, base_price, stock_quantity, has_variants, unit_weight_grams, is_active, created_at')
+          .or('is_active.is.null,is_active.eq.true')
+          .order('created_at', { ascending: false }),
+        supabase
+          .from('product_variants')
+          .select('*'),
+        getStoreSettingsCached(forceRefresh),
+      ]);
 
+      const catData = catRes.status === 'fulfilled' ? catRes.value.data : null;
+      const catErr = catRes.status === 'fulfilled' ? catRes.value.error : catRes.reason;
       if (catErr) console.warn('Categories query warning:', catErr);
 
-      // 2. Fetch Products
-      const { data: prodData, error: prodErr } = await supabase
-        .from('products')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      // 3. Fetch Product Variants
-      const { data: varData, error: varErr } = await supabase
-        .from('product_variants')
-        .select('*');
-
+      const varData = varRes.status === 'fulfilled' ? varRes.value.data : null;
+      const varErr = varRes.status === 'fulfilled' ? varRes.value.error : varRes.reason;
       if (varErr) console.warn('Product variants fetch warning:', varErr);
 
-      // 4. Fetch Store Settings for Store Logo & Name
-      const { data: storeSettingsData } = await supabase
-        .from('store_settings')
-        .select('store_logo, store_name')
-        .limit(1)
-        .maybeSingle();
+      if (settings.status === 'fulfilled') {
+        if (settings.value.store_logo) setStoreLogo(settings.value.store_logo);
+        if (settings.value.store_name) setStoreName(settings.value.store_name);
+      }
 
-      if (storeSettingsData?.store_logo) {
-        setStoreLogo(storeSettingsData.store_logo);
-      }
-      if (storeSettingsData?.store_name) {
-        setStoreName(storeSettingsData.store_name);
-      }
+      const prodData = prodRes.status === 'fulfilled' ? prodRes.value.data : null;
+      const prodErr =
+        prodRes.status === 'fulfilled'
+          ? prodRes.value.error
+          : { message: String(prodRes.reason) };
 
       if (prodErr) {
         console.error('Error fetching products:', prodErr);
@@ -284,21 +375,23 @@ export default function App() {
             };
           });
 
-        setProducts(formattedProducts);
-      }
+        let finalCategories: Category[] = [];
+        if (catData && catData.length > 0) {
+          finalCategories = catData as Category[];
+        } else if (rawProducts.length > 0) {
+          const uniqueCatNames = Array.from(
+            new Set(rawProducts.map((p) => p.category).filter(Boolean))
+          );
+          finalCategories = uniqueCatNames.map((name, idx) => ({
+            id: `derived-${idx}`,
+            name: name as string,
+          }));
+        }
 
-      // Format categories or derive if empty
-      if (catData && catData.length > 0) {
-        setCategories(catData as Category[]);
-      } else if (prodData && prodData.length > 0) {
-        const uniqueCatNames = Array.from(
-          new Set(prodData.map((p: any) => p.category).filter(Boolean))
-        );
-        const derived: Category[] = uniqueCatNames.map((name, idx) => ({
-          id: `derived-${idx}`,
-          name: name as string,
-        }));
-        setCategories(derived);
+        setCategories(finalCategories);
+        setProducts(formattedProducts);
+        setCatalogCache(finalCategories, formattedProducts);
+        setLoadingData(false);
       }
     } catch (err: any) {
       console.error('Fetch data exception:', err);
@@ -306,14 +399,38 @@ export default function App() {
     } finally {
       setLoadingData(false);
     }
-  };
-
-  useEffect(() => {
-    fetchData();
   }, []);
 
+  // Load only the data needed for the active viewMode
+  useEffect(() => {
+    if (viewMode === 'public-tag') {
+      setLoadingData(false);
+      return;
+    }
+
+    if (viewMode === 'store') {
+      if (products.length === 0) {
+        fetchData(false);
+      }
+    } else {
+      // lost-found or thankyou-note only need lightweight store_settings
+      getStoreSettingsCached(false).then((settings) => {
+        if (settings.store_logo) setStoreLogo(settings.store_logo);
+        if (settings.store_name) setStoreName(settings.store_name);
+      });
+      setLoadingData(false);
+    }
+  }, [viewMode, products.length, fetchData]);
+
+  // Defer ~5MB Base64 product image hydration until customer actually enters the store catalog
+  useEffect(() => {
+    if (viewMode === 'store' && customer && products.length > 0) {
+      hydrateProductImages(products);
+    }
+  }, [viewMode, customer, products, hydrateProductImages]);
+
   // Cart Operations
-  const handleAddToCart = (product: Product, selectedVariant?: ProductVariant) => {
+  const handleAddToCart = useCallback((product: Product, selectedVariant?: ProductVariant) => {
     const cartItemId = selectedVariant
       ? `${product.id}-${selectedVariant.id}`
       : `${product.id}-base`;
@@ -340,9 +457,9 @@ export default function App() {
         },
       ];
     });
-  };
+  }, []);
 
-  const handleUpdateQuantity = (cartItemId: string, delta: number) => {
+  const handleUpdateQuantity = useCallback((cartItemId: string, delta: number) => {
     setCart((prev) => {
       return prev
         .map((item) => {
@@ -357,7 +474,18 @@ export default function App() {
         })
         .filter(Boolean) as CartItem[];
     });
-  };
+  }, []);
+
+  const handleCardUpdateQuantity = useCallback(
+    (product: Product, delta: number) => {
+      handleUpdateQuantity(`${product.id}-base`, delta);
+    },
+    [handleUpdateQuantity]
+  );
+
+  const handleOpenDetail = useCallback((product: Product) => {
+    setDetailProduct(product);
+  }, []);
 
   const handleRemoveItem = (cartItemId: string) => {
     setCart((prev) => prev.filter((item) => item.id !== cartItemId));
@@ -458,26 +586,40 @@ export default function App() {
     }
   };
 
-  // Filtered Products
-  const filteredProducts = products.filter((product) => {
-    if (!isProductActive(product)) return false;
+  // Filtered Products (memoized to prevent redundant work on unrelated re-renders)
+  const filteredProducts = useMemo(() => {
+    const selectedCategoryName = selectedCategoryId
+      ? categories.find((c) => c.id === selectedCategoryId)?.name
+      : null;
+    const q = searchQuery.trim().toLowerCase();
 
-    if (selectedCategoryId) {
-      const matchCatId = product.category_id === selectedCategoryId;
-      const matchCatName = categories.find((c) => c.id === selectedCategoryId)?.name === product.category;
-      if (!matchCatId && !matchCatName) return false;
+    return products.filter((product) => {
+      if (!isProductActive(product)) return false;
+
+      if (selectedCategoryId) {
+        const matchCatId = product.category_id === selectedCategoryId;
+        const matchCatName = selectedCategoryName === product.category;
+        if (!matchCatId && !matchCatName) return false;
+      }
+
+      if (q) {
+        const matchName = product.name?.toLowerCase().includes(q);
+        const matchDesc = product.description?.toLowerCase().includes(q);
+        const matchCat = product.category?.toLowerCase().includes(q);
+        if (!matchName && !matchDesc && !matchCat) return false;
+      }
+
+      return true;
+    });
+  }, [products, categories, selectedCategoryId, searchQuery]);
+
+  const cartQtyByProductId = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const item of cart) {
+      map.set(item.product.id, (map.get(item.product.id) || 0) + item.quantity);
     }
-
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchName = product.name?.toLowerCase().includes(q);
-      const matchDesc = product.description?.toLowerCase().includes(q);
-      const matchCat = product.category?.toLowerCase().includes(q);
-      if (!matchName && !matchDesc && !matchCat) return false;
-    }
-
-    return true;
-  });
+    return map;
+  }, [cart]);
 
   // Dedicated standalone view-only QR Pet Tag page (Emergency Tag after scanning physical QR)
   if (viewMode === 'public-tag') {
@@ -644,7 +786,7 @@ export default function App() {
             </div>
 
             <button
-              onClick={fetchData}
+              onClick={() => fetchData(true)}
               disabled={loadingData}
               className="flex items-center space-x-1.5 text-xs font-semibold text-slate-600 hover:text-emerald-700 bg-white hover:bg-slate-100 border border-slate-200 px-3 py-2 rounded-xl transition-all cursor-pointer shadow-2xs disabled:opacity-50"
             >
@@ -676,7 +818,7 @@ export default function App() {
               </div>
               <h4 className="font-bold text-base">{dataError}</h4>
               <button
-                onClick={fetchData}
+                onClick={() => fetchData(true)}
                 className="px-4 py-2 bg-rose-600 text-white rounded-xl text-xs font-bold hover:bg-rose-700 transition-colors cursor-pointer"
               >
                 Coba Lagi
@@ -705,25 +847,16 @@ export default function App() {
           ) : (
             /* Product Grid */
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 sm:gap-6">
-              {filteredProducts.map((product) => {
-                const totalQtyInCart = cart
-                  .filter((item) => item.product.id === product.id)
-                  .reduce((sum, item) => sum + item.quantity, 0);
-
-                return (
-                  <ProductCard
-                    key={product.id}
-                    product={product}
-                    quantityInCart={totalQtyInCart}
-                    onAddToCart={handleAddToCart}
-                    onUpdateQuantity={(p, delta) => {
-                      const defaultItemId = `${p.id}-base`;
-                      handleUpdateQuantity(defaultItemId, delta);
-                    }}
-                    onOpenDetail={(p) => setDetailProduct(p)}
-                  />
-                );
-              })}
+              {filteredProducts.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  quantityInCart={cartQtyByProductId.get(product.id) || 0}
+                  onAddToCart={handleAddToCart}
+                  onUpdateQuantity={handleCardUpdateQuantity}
+                  onOpenDetail={handleOpenDetail}
+                />
+              ))}
             </div>
           )}
         </main>
