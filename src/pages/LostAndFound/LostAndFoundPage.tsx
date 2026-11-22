@@ -14,7 +14,6 @@ import {
   Check, 
   Copy, 
   ExternalLink, 
-  Sparkles, 
   Info, 
   UserCheck, 
   RefreshCw, 
@@ -859,15 +858,23 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
               )}
             </div>
 
-            {/* Temperament / Medical Alert Pill Card */}
-            <div className="px-5 py-2 relative z-10">
-              <div className="w-full bg-[#ECE7DF] border border-[#DDD5C7] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-2xs">
-                <div className="w-8 h-8 rounded-full bg-[#BD7858] text-white flex items-center justify-center shrink-0 shadow-xs">
+            {/* Temperament / Medical Alert Pill Card (Minimalist Layered Paper Cutout) */}
+            <div className="px-5 py-2.5 relative z-10">
+              <div className="relative w-full bg-[#FCFBF7] border-2 border-[#EFECE4] rounded-full py-2.5 px-4 flex items-center space-x-3 shadow-[0_8px_20px_-4px_rgba(92,68,51,0.16),0_2px_6px_rgba(92,68,51,0.08),inset_0_1px_0_rgba(255,255,255,0.95)]">
+                <span
+                  className="absolute inset-0 translate-x-1 translate-y-1 rotate-[0.6deg] rounded-full bg-[#E8E0D3] border border-[#DAD0C0] shadow-[0_6px_14px_rgba(92,68,51,0.11)] -z-10 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <span
+                  className="absolute inset-0 -translate-x-0.5 translate-y-2 -rotate-[0.5deg] rounded-full bg-[#DDD2C1]/80 shadow-[0_4px_10px_rgba(92,68,51,0.08)] -z-20 pointer-events-none"
+                  aria-hidden="true"
+                />
+                <div className="w-8 h-8 rounded-full bg-[#BD7858] text-[#FDFBF7] ring-2 ring-[#EFEAE0] flex items-center justify-center shrink-0 shadow-[inset_0_2px_4px_rgba(59,42,30,0.22),0_2px_4px_rgba(92,68,51,0.12)]">
                   <Activity className="w-4 h-4" />
                 </div>
-                <div className="text-xs sm:text-sm leading-snug text-[#5A4636]">
+                <div className="text-xs sm:text-sm leading-snug text-[#6B5645]">
                   <strong className="font-extrabold text-[#3B2A1E]">{currentPet.temperamentTitle}</strong>{' '}
-                  <span className="font-medium text-[#5A4636]">{currentPet.temperamentDesc}</span>
+                  <span className="font-medium text-[#6B5645]">{currentPet.temperamentDesc}</span>
                 </div>
               </div>
             </div>
@@ -875,13 +882,6 @@ export const LostAndFoundPage: React.FC<LostAndFoundPageProps> = ({
             {/* Direct WhatsApp CTA Button Highlight Card (Sending WhatsApp message to member phone) */}
             <div className="px-5 pb-4 pt-2.5 relative z-10">
               <div className="bg-[#FCFBF8] rounded-2xl p-4 border border-[#E4DDD0] shadow-[0_6px_18px_rgba(92,68,51,0.08)] space-y-3">
-                <div className="flex items-center justify-between text-xs font-extrabold text-[#3B2A1E]">
-                  <span className="flex items-center gap-1.5">
-                    <Sparkles className="w-4 h-4 text-[#C68642]" />
-                    Kirim Pesan WhatsApp ke Pemilik
-                  </span>
-                </div>
-
                 {/* Primary Direct WhatsApp CTA Button -> Native <a> once GPS is off/resolved/attempted, button on initial GPS trigger */}
                 {(!currentPet.enable_gps_sharing || locationAddress || gpsAttempted) ? (
                   <a
